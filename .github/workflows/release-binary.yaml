@@ -45,8 +45,8 @@ jobs:
                   ;;
           esac
           cp target/${{ matrix.target }}/release/unbound-telemetry $stage/
-          cd $stage
           RELEASE_VERSION=$(date +'%Y-%m-%d')-$(git rev-parse --short HEAD)
+          cd $stage
           ASSET_NAME="unbound-telemetry-$RELEASE_VERSION-${{ matrix.target }}.tar.gz"
           ASSET_PATH="$src/$ASSET_NAME"
           CHECKSUM_PATH="$ASSET_PATH.sha256"
