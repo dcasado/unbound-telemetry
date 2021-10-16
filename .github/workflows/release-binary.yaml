@@ -8,57 +8,32 @@ name: Publish binary
 jobs:
   publish-to-github:
     name: Publish to Github
-    runs-on: ${{matrix.os}}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          #- build: linux
-          #  os: ubuntu-latest
-          #  rust: stable
-          #  target: x86_64-unknown-linux-musl
-          #  cross: false
-          #- build: arm-v7
-          #  os: ubuntu-latest
-          #  rust: stable
-          #  target: armv7-unknown-linux-gnueabihf
-          #  linker: gcc-arm-linux-gnueabihf
-          #  cross: true
-          - build: aarch64
-            os: ubuntu-latest
-            rust: stable
-            target: aarch64-unknown-linux-gnu
-            linker: gcc-aarch64-linux-gnu
-            cross: true
+        target:
+          - aarch64-unknown-linux-gnu
+          - armv7-unknown-linux-gnueabihf
+        toolchain:
+          - 1.46.0  # MSRV
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
         with:
-          fetch-depth: 1
-
-      - name: Cache
-        uses: actions/cache@v2
+          profile: minimal
+          toolchain: ${{ matrix.toolchain }}
+          override: true
+          target: ${{ matrix.target }}
+      - name: Run build
+        uses: actions-rs/cargo@v1
+        env:
+          PKG_CONFIG_ALLOW_CROSS: 1
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            ~/.rustup
-            target
-          key: ${{ runner.os }}-${{ matrix.rust }}
-
-      - name: Install Linker
-        if: matrix.cross
-        run: |
-          sudo apt update
-          sudo apt install ${{ matrix.linker }}
-
-      - name: Install Rust
-        run: |
-          rustup install ${{ matrix.rust }}
-          rustup target add ${{ matrix.target }}
-          rustup show
-
-      - name: Build
-        run: cargo build --release --target ${{ matrix.target }}
+          command: build
+          args: --target ${{ matrix.target }} --features vendored
+          use-cross: true
 
       - name: Package Artifacts
         run: |
