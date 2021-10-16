@@ -12,17 +12,17 @@ jobs:
     strategy:
       matrix:
         include:
-          - build: linux
-            os: ubuntu-latest
-            rust: stable
-            target: x86_64-unknown-linux-musl
-            cross: false
-          - build: arm-v7
-            os: ubuntu-latest
-            rust: stable
-            target: armv7-unknown-linux-gnueabihf
-            linker: gcc-arm-linux-gnueabihf
-            cross: true
+          #- build: linux
+          #  os: ubuntu-latest
+          #  rust: stable
+          #  target: x86_64-unknown-linux-musl
+          #  cross: false
+          #- build: arm-v7
+          #  os: ubuntu-latest
+          #  rust: stable
+          #  target: armv7-unknown-linux-gnueabihf
+          #  linker: gcc-arm-linux-gnueabihf
+          #  cross: true
           - build: aarch64
             os: ubuntu-latest
             rust: stable
@@ -56,8 +56,9 @@ jobs:
           rustup install ${{ matrix.rust }}
           rustup target add ${{ matrix.target }}
           rustup show
+
       - name: Build
-        run: cargo build --release --target ${{ matrix.target }} --features vendored
+        run: cargo build --release --target ${{ matrix.target }}
 
       - name: Package Artifacts
         run: |
